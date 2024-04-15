@@ -63,7 +63,6 @@ InferCreationAttributes<Village>
             village: {
                 type: DataTypes.STRING,
                 allowNull: false,
-                unique: true,
             },
             aboutVillage: {
                 type: DataTypes.STRING,

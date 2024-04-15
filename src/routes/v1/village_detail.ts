@@ -32,7 +32,7 @@ router.patch('/', isAdmin, validate(villageUpdateValidations), asyncMiddleware(a
     } });
     const [village, villageExists] = await Promise.all([villagePromise, villageExistsPromise]);
     if (!village) {
-        return output(res, 404, 'Village not found', null, 'NOT_FOUND_ERROR');
+        return output(res, 400, 'Village not found', null, 'BAD_REQUEST');
     }
     if (villageExists) {
         return output(res, 409, 'Village already exists', null, 'CONFLICT_ERROR');
@@ -40,6 +40,18 @@ router.patch('/', isAdmin, validate(villageUpdateValidations), asyncMiddleware(a
     const updatedVillage = await Village.update({ ...req.body }, { where: { id: villageId }, returning: true });
     const updatedVillageData = updatedVillage[1][0].dataValues;
     return output(res, 200, 'Village updated successfully', updatedVillageData, null);
+})
+);
+
+// village delete
+router.delete('/', isAdmin, asyncMiddleware(async (req: Request, res: Response, next: NextFunction) => {
+    const { villageId } = req.params;
+    const village = await Village.findOne({ where: { id: villageId } });
+    if (!village) {
+        return output(res, 400, 'Village not found', null, 'BAD_REQUEST');
+    }
+    await village.destroy();
+    return output(res, 200, 'Village deleted successfully', null, null);
 })
 );
 

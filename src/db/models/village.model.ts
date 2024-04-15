@@ -85,7 +85,7 @@ InferCreationAttributes<Village>
     static selectionAllowedFields: string[] =
         ['id', 'province', 'district', 'sector', 'cell', 'village', 'aboutVillage', 'createdAt', 'updatedAt'];
     static defaultSortFields: OrderClause[] = [
-        ['village', 'asc'], ['createdAt', 'desc'],
+        ['village', 'asc'],
     ];
     static sortAllowedFields: string[] = ['province', 'district', 'sector', 'cell', 'village', 'createdAt', 'updatedAt'];
     static queryAllowedFields: { [field: string]: { type: QueryParameterType } } = {

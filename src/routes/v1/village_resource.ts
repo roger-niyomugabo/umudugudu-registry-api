@@ -5,7 +5,8 @@ import output from '../../utils/response';
 import { asyncMiddleware } from '../../middleware/error_middleware';
 import { Village } from '../../db/models';
 import { isAdmin } from '../../middleware/access_middleware';
-import { validate } from '../../middleware/middleware';
+import { pagination, validate } from '../../middleware/middleware';
+import { computePaginationRes } from '../../utils';
 
 const router = express.Router();
 
@@ -27,6 +28,29 @@ router.post('/', isAdmin, validate(villageValidations), asyncMiddleware(async (r
     }
     const newVillage = await Village.create({ ...req.body });
     return output(res, 201, 'Vilage created successfully', newVillage, null);
+})
+);
+
+// Get all villages
+router.get('/', isAdmin, pagination, asyncMiddleware(async (req: Request, res: Response, next: NextFunction) => {
+    const orderClause = Village.getOrderQuery(req.query);
+    const selectClause = Village.getSelectionQuery(req.query);
+    // const whereClause = Village.getWhereQuery(req.query);
+
+    const villages = await Village.findAndCountAll({
+        order: orderClause,
+        attributes: selectClause,
+        limit: res.locals.pagination.limit,
+        offset: res.locals.pagination.offset,
+    });
+    return output(
+        res, 200, 'Villages retrieved successfully',
+        computePaginationRes(
+            res.locals.pagination.page,
+            res.locals.pagination.limit,
+            villages.count,
+            villages.rows),
+        null);
 })
 );
 

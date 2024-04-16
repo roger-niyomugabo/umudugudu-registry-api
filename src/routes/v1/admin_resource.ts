@@ -8,7 +8,7 @@ import { AdminUser, User } from '../../db/models';
 import { asyncMiddleware } from '../../middleware/error_middleware';
 import output from '../../utils/response';
 import { db } from '../../db';
-import { check, generate } from '../../utils/bcrypt';
+import { generate } from '../../utils/bcrypt';
 import { sign } from '../../utils/jwt';
 
 const router = express.Router();
@@ -57,31 +57,6 @@ router.post('/signup', validate(adminSignupValidations), asyncMiddleware(async (
 
     const token = sign({ adminUserId: adminUser.id, role: adminUser.role });
     return output(res, 201, 'Signup successfully', { adminUser, token }, null);
-})
-);
-
-// Admin login validations
-const adminLoginValidations = Joi.object({
-    email: Joi.string().email().required(),
-    password: Joi.string().required(),
-});
-// Admin login
-router.post('/login', validate(adminLoginValidations), asyncMiddleware(async (req: Request, res: Response, next: NextFunction) => {
-    const { email, password } = req.body;
-    const user = await User.findOne({ where: { email },
-        include: [{ model: AdminUser, as: 'admin_user' }],
-    });
-    if (!user || user.role !== 'admin') {
-        return output(res, 404, 'Email not registered', null, 'NOT_FOUND_ERROR');
-    }
-    const isMatch = check(user.password, password);
-    if (!isMatch) {
-        return output(res, 400, 'Incorrect email or password', null, 'BAD_REQUEST');
-    }
-    user.password = undefined;
-    const token = sign({ adminUserId: user.id, role: user.role });
-
-    return output(res, 200, 'Logged in successfully', { user, token }, null);
 })
 );
 

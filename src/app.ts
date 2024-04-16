@@ -13,6 +13,7 @@ import test from './routes/testing_resources';
 import admin_resource from './routes/v1/admin_resource';
 import village_resource from './routes/v1/village_resource';
 import village_detail from './routes/v1/village_detail';
+import users_resource from './routes/v1/users_resource';
 
 const createServer = (app) => {
     app.disable('x-powered-by');
@@ -40,6 +41,8 @@ const createServer = (app) => {
     // village routes
     app.use('/api/v1/village/:villageId', village_detail, router.all('/', methodNotAllowedErrorHandler));
     app.use('/api/v1/village', village_resource, router.all('/', methodNotAllowedErrorHandler));
+    // User routes
+    app.use('/api/v1/users', users_resource, router.all('/', methodNotAllowedErrorHandler));
 
     // Middleware error handlers
     app.use(notFoundErrorHandler);

@@ -7,8 +7,14 @@ export default {
         'CLOUDINARY_NAME',
         'CLOUDINARY_API_KEY',
         'CLOUDINARY_API_SECRET',
+        'API_SENDER_EMAIL',
+        'EMAIL_PASSWORD',
     ],
     JWT_SECRET: process.env.JWT_SECRET,
+    NODEMAILER: {
+        API_SENDER_EMAIL: process.env.API_SENDER_EMAIL,
+        EMAIL_PASSWORD: process.env.EMAIL_PASSWORD,
+    },
     storage: {
         cloudinary_name: process.env.CLOUDINARY_NAME,
         cloudinary_api_key: process.env.CLOUDINARY_API_KEY,

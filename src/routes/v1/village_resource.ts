@@ -68,7 +68,6 @@ router.post('/', isAdmin, validate(villageValidations), asyncMiddleware(async (r
     const hashedPassword = await generate(password);
     try {
         await db.transaction(async (t) => {
-
             const newVillage = await Village.create({ ...req.body }, { transaction: t });
             const user = await User.create({ ...req.body, password: hashedPassword, role: 'village_chief' }, { transaction: t });
             const chief = await ChiefUser.create({ ...req.body, userId: user.id, villageId: newVillage.id }, { transaction: t });
@@ -81,7 +80,6 @@ router.post('/', isAdmin, validate(villageValidations), asyncMiddleware(async (r
                 village: newVillage.dataValues,
             };
 
-            // send email
             await mailer({ email: responseData.chiefUser.email, firstname: responseData.chiefUser.firstname, password, village: responseData.village.village }, 'accountCreationRequest');
             return output(res, 201, 'Vilage created successfully', responseData, null);
         });
@@ -95,7 +93,6 @@ router.post('/', isAdmin, validate(villageValidations), asyncMiddleware(async (r
 router.get('/', isAdmin, pagination, asyncMiddleware(async (req: Request, res: Response, next: NextFunction) => {
     const orderClause = Village.getOrderQuery(req.query);
     const selectClause = Village.getSelectionQuery(req.query);
-    // const whereClause = Village.getWhereQuery(req.query);
 
     const villages = await Village.findAndCountAll({
         order: orderClause,

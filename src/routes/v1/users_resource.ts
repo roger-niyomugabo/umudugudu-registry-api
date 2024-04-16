@@ -41,11 +41,11 @@ router.post('/login', validate(adminLoginValidations), asyncMiddleware(async (re
         return output(res, 200, 'Logged in successfully', { user, token }, null);
     }
     if (user.role === 'village_chief') {
-        const token = sign({ chiefUserId: user.id, role: user.role });
+        const token = sign({ chiefUserId: user.id, villageId: user.chief_user.villageId, role: user.role });
         return output(res, 200, 'Logged in successfully', { user, token }, null);
     }
     if (user.role === 'resident') {
-        const token = sign({ residentUserId: user.id, role: user.role });
+        const token = sign({ residentUserId: user.id, villageId: user.resident_user.villageId, role: user.role });
         return output(res, 200, 'Logged in successfully', { user, token }, null);
     }
     return output(res, 400, 'Invalid login cridentials', null, 'BAD_REQUEST');

@@ -54,13 +54,13 @@ InferCreationAttributes<User>
     declare createHelperUser: HasManyCreateAssociationMixin<ChiefUser>;
 
     // User hasOne ResidentUser
-    declare business_owner_user?: NonAttribute<ResidentUser>;
-    declare getBusinessOwnerUser: HasManyGetAssociationsMixin<ResidentUser>;
-    declare setBusinessOwnerUser: HasManySetAssociationsMixin<ResidentUser, number>;
-    declare createBusinessOwnerUser: HasManyCreateAssociationMixin<ResidentUser>;
+    declare resident_user?: NonAttribute<ResidentUser>;
+    declare getResidentUser: HasManyGetAssociationsMixin<ResidentUser>;
+    declare setResidentUser: HasManySetAssociationsMixin<ResidentUser, number>;
+    declare createResidentUser: HasManyCreateAssociationMixin<ResidentUser>;
 
     // User hasOne AdminUser
-    declare adminUser?: NonAttribute<AdminUser>;
+    declare admin_user?: NonAttribute<AdminUser>;
     declare getAdminUser: HasManyGetAssociationsMixin<AdminUser>;
     declare setAdminUser: HasManySetAssociationsMixin<AdminUser, number>;
     declare createAdminUser: HasManyCreateAssociationMixin<AdminUser>;

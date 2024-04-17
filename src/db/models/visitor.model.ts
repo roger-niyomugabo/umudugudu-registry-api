@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/member-ordering */
 import {
+    Association,
     CreationOptional,
     DataTypes,
     InferAttributes,
@@ -9,6 +10,7 @@ import {
 import { OrderClause, QueryParameterType, WhereAutoClause } from 'interfaces/sequelize_query_builder';
 import { genderT } from 'interfaces/userInterface';
 import { buildOrderSequelizeFilters, buildSelectionSequelizeFilters, buildWhereSequelizeFilters } from '../../utils';
+import { Village } from './village.model';
 
 export class Visitor extends Model<
 InferAttributes<Visitor>,
@@ -24,6 +26,10 @@ InferCreationAttributes<Visitor>
     declare profession: string;
     declare createdAt: CreationOptional<Date>;
     declare updatedAt: CreationOptional<Date>;
+
+    declare static associations: {
+        Village: Association<Visitor, Village>;
+    };
 
     static initModel(sequelize: Sequelize): typeof Visitor {
         Visitor.init({
@@ -46,12 +52,11 @@ InferCreationAttributes<Visitor>
             },
             email: {
                 type: DataTypes.STRING,
-                allowNull: true,
+                allowNull: false,
             },
             phoneNumber: {
                 type: DataTypes.STRING,
                 allowNull: false,
-                unique: true,
             },
             gender: {
                 type: DataTypes.STRING,

@@ -90,13 +90,13 @@ export function initModels(sequelize: Sequelize) {
         },
     });
 
-    User.hasMany(Visit, {
+    ResidentUser.hasMany(Visit, {
         foreignKey: {
             allowNull: false,
         },
         onDelete: 'CASCADE',
     });
-    Visit.belongsTo(User, {
+    Visit.belongsTo(ResidentUser, {
         foreignKey: {
             allowNull: false,
         },

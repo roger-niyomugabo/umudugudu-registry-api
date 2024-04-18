@@ -16,6 +16,8 @@ import village_detail from './routes/v1/village_detail';
 import users_resource from './routes/v1/users_resource';
 import resident_resource from './routes/v1/resident_resource';
 import visit_resource from './routes/v1/visit_resource';
+import announcement_detail from './routes/v1/announcement_detail';
+import announcement_resource from './routes/v1/announcement_resource';
 
 const createServer = (app) => {
     app.disable('x-powered-by');
@@ -49,6 +51,9 @@ const createServer = (app) => {
     app.use('/api/v1/resident', resident_resource, router.all('/', methodNotAllowedErrorHandler));
     // Visit routes
     app.use('/api/v1/visit', visit_resource, router.all('/', methodNotAllowedErrorHandler));
+    // Announcement routes
+    app.use('/api/v1/announcement/:announcementId', announcement_detail, router.all('/', methodNotAllowedErrorHandler));
+    app.use('/api/v1/announcement', announcement_resource, router.all('/', methodNotAllowedErrorHandler));
 
     // Middleware error handlers
     app.use(notFoundErrorHandler);

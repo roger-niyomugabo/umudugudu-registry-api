@@ -6,6 +6,7 @@ import { ResidentUser } from './resident_user';
 import { Village } from './village.model';
 import { Visitor } from './visitor.model';
 import { Visit } from './visit.model';
+import { Announcement } from './announcement.model';
 
 export {
     User,
@@ -14,7 +15,8 @@ export {
     ChiefUser,
     Village,
     Visitor,
-    Visit
+    Visit,
+    Announcement
 };
 
 export function initModels(sequelize: Sequelize) {
@@ -25,6 +27,7 @@ export function initModels(sequelize: Sequelize) {
     Village.initModel(sequelize);
     Visitor.initModel(sequelize);
     Visit.initModel(sequelize);
+    Announcement.initModel(sequelize);
 
     // Model associations
     User.hasOne(AdminUser, {
@@ -126,6 +129,29 @@ export function initModels(sequelize: Sequelize) {
         },
     });
 
+    Village.hasMany(Announcement, {
+        foreignKey: {
+            allowNull: false,
+        },
+        onDelete: 'CASCADE',
+    });
+    Announcement.belongsTo(Village, {
+        foreignKey: {
+            allowNull: false,
+        },
+    });
+
+    User.hasMany(Announcement, {
+        foreignKey: {
+            allowNull: false,
+        },
+    });
+    Announcement.belongsTo(User, {
+        foreignKey: {
+            allowNull: false,
+        },
+    });
+
     return {
         User,
         AdminUser,
@@ -134,5 +160,6 @@ export function initModels(sequelize: Sequelize) {
         Village,
         Visitor,
         Visit,
+        Announcement,
     };
 }

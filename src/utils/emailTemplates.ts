@@ -35,7 +35,7 @@ const accountCreationTemplate = (info: EmailInfo) => `
 </head>
 <body>
     <div class="content">
-        <p>Hello ${info.firstname},</p>
+        <p>Hello ${info.fullName},</p>
         <p>You have been registered for an account on Visit Record Keeping Application!</p>
         <p>And you have been assigned as the leader of <strong>${info.village}</strong> village. Below are your login credentials.</p>
         <p>Email: ${info.email}</p>
@@ -80,7 +80,7 @@ const residentRegistrationTemplate = (info: EmailInfo) => `
 </head>
 <body>
     <div class="content">
-        <p>Hello ${info.firstname},</p>
+        <p>Hello ${info.fullName},</p>
         <p>You have been registered for an account on Visit Record Keeping Application!</p>
         <p>And you have been registered as a resident of <strong>${info.village}</strong> village. Below are your login credentials.</p>
         <p>Email: ${info.email}</p>

@@ -24,9 +24,6 @@ InferCreationAttributes<ChiefUser>
     declare id: CreationOptional<string>;
     declare userId: ForeignKey<User['id']>;
     declare villageId: ForeignKey<Village['id']>;
-    declare username: string;
-    declare dateOfBirth: string;
-    declare nationality: string;
     declare profession: string;
     declare createdAt: CreationOptional<Date>;
     declare updatedAt: CreationOptional<Date>;
@@ -58,19 +55,6 @@ InferCreationAttributes<ChiefUser>
                 allowNull: false,
                 defaultValue: Sequelize.literal('gen_random_uuid()'),
             },
-            username: {
-                type: DataTypes.STRING,
-                allowNull: false,
-                unique: true,
-            },
-            dateOfBirth: {
-                type: DataTypes.STRING,
-                allowNull: false,
-            },
-            nationality: {
-                type: DataTypes.STRING,
-                allowNull: false,
-            },
             profession: {
                 type: DataTypes.STRING,
                 allowNull: false,
@@ -89,16 +73,13 @@ InferCreationAttributes<ChiefUser>
         return ChiefUser;
     }
 
-    static selectionAllowedFields: string[] = ['id', 'username', 'dateOfBirth', 'nationality', 'profession', 'createdAt', 'updatedAt'];
+    static selectionAllowedFields: string[] = ['id', 'profession', 'createdAt', 'updatedAt'];
     static defaultSortFields: OrderClause[] = [
-        ['username', 'asc'], ['createdAt', 'desc'],
+        ['createdAt', 'desc'],
     ];
-    static sortAllowedFields: string[] = ['username', 'dateOfBirth', 'nationality', 'createdAt', 'updatedAt'];
+    static sortAllowedFields: string[] = ['profession', 'createdAt', 'updatedAt'];
     static queryAllowedFields: { [field: string]: { type: QueryParameterType } } = {
         id: { type: 'string' },
-        username: { type: 'string' },
-        dateOfBirth: { type: 'string' },
-        nationality: { type: 'string' },
         profession: { type: 'string' },
         createdAt: { type: 'string' },
         updatedAt: { type: 'string' },

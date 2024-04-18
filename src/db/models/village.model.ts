@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/member-ordering */
 import {
+    Association,
     CreationOptional,
     DataTypes,
     HasManyCreateAssociationMixin,
@@ -13,6 +14,7 @@ import {
 import { OrderClause, QueryParameterType, WhereAutoClause } from 'interfaces/sequelize_query_builder';
 import { buildOrderSequelizeFilters, buildSelectionSequelizeFilters, buildWhereSequelizeFilters } from '../../utils';
 import { ChiefUser } from './chief_user';
+import { ResidentUser } from './resident_user';
 
 export class Village extends Model<
 InferAttributes<Village>,
@@ -29,11 +31,21 @@ InferCreationAttributes<Village>
     declare updatedAt: CreationOptional<Date>;
 
     // Village hasMany ChiefUser
-    declare chiefUser?: NonAttribute<ChiefUser>;
+    declare chief_user?: NonAttribute<ChiefUser>;
     declare getChiefUser: HasManyGetAssociationsMixin<ChiefUser>;
     declare setChiefUser: HasManySetAssociationsMixin<ChiefUser, number>;
     declare createChiefUser: HasManyCreateAssociationMixin<ChiefUser>;
 
+    // Village hasMany ResidentUser
+    declare resident_user?: NonAttribute<ResidentUser>;
+    declare getResidentUser: HasManyGetAssociationsMixin<ResidentUser>;
+    declare setResidentUser: HasManySetAssociationsMixin<ResidentUser, number>;
+    declare createResidentUser: HasManyCreateAssociationMixin<ResidentUser>;
+
+    declare static associations: {
+        ChiefUser: Association<Village, ChiefUser>;
+        ResidentUser: Association<Village, ResidentUser>;
+    };
     static initModel(sequelize: Sequelize): typeof Village {
         Village.init({
             id: {
@@ -75,7 +87,7 @@ InferCreationAttributes<Village>
                 type: DataTypes.DATE,
             },
         }, {
-            modelName: 'villages',
+            modelName: 'village',
             sequelize,
         });
 

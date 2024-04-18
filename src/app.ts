@@ -15,6 +15,7 @@ import village_resource from './routes/v1/village_resource';
 import village_detail from './routes/v1/village_detail';
 import users_resource from './routes/v1/users_resource';
 import resident_resource from './routes/v1/resident_resource';
+import visit_resource from './routes/v1/visit_resource';
 
 const createServer = (app) => {
     app.disable('x-powered-by');
@@ -44,8 +45,10 @@ const createServer = (app) => {
     app.use('/api/v1/village', village_resource, router.all('/', methodNotAllowedErrorHandler));
     // User routes
     app.use('/api/v1/users', users_resource, router.all('/', methodNotAllowedErrorHandler));
-
+    // Resident routes
     app.use('/api/v1/resident', resident_resource, router.all('/', methodNotAllowedErrorHandler));
+    // Visit routes
+    app.use('/api/v1/visit', visit_resource, router.all('/', methodNotAllowedErrorHandler));
 
     // Middleware error handlers
     app.use(notFoundErrorHandler);

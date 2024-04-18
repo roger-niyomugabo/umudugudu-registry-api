@@ -14,30 +14,31 @@ import {
     Sequelize } from 'sequelize';
 import { OrderClause, QueryParameterType, WhereAutoClause } from 'interfaces/sequelize_query_builder';
 import { buildOrderSequelizeFilters, buildSelectionSequelizeFilters, buildWhereSequelizeFilters } from '../../utils';
-import { User } from './user.model';
 import { Village } from './village.model';
 import { Visitor } from './visitor.model';
+import { ResidentUser } from './resident_user';
 
 export class Visit extends Model<
 InferAttributes<Visit>,
 InferCreationAttributes<Visit>
 > {
     declare id: CreationOptional<string>;
-    declare residentId: ForeignKey<User['id']>;
+    declare residentUserId: ForeignKey<ResidentUser['id']>;
     declare visitorId: ForeignKey<Visitor['id']>;
     declare villageId: ForeignKey<Village['id']>;
     declare origin: string;
     declare visitReason: string;
     declare duration: string;
     declare arrivalDate: string;
+    declare file?: string;
     declare createdAt: CreationOptional<Date>;
     declare updatedAt: CreationOptional<Date>;
 
-    // Visit belongs to residentUser or helperUser
-    declare user?: NonAttribute<User>;
-    declare getUser: HasManyGetAssociationsMixin<User>;
-    declare setUser: HasManySetAssociationsMixin<User, number>;
-    declare createUser: HasManyCreateAssociationMixin<User>;
+    // Visit belongs to residentUser
+    declare resident_user?: NonAttribute<ResidentUser>;
+    declare getResidentUser: HasManyGetAssociationsMixin<ResidentUser>;
+    declare setResidentUser: HasManySetAssociationsMixin<ResidentUser, number>;
+    declare createResidentUser: HasManyCreateAssociationMixin<ResidentUser>;
 
     // Visit belongs to visitor
     declare visitor?: NonAttribute<Visitor>;
@@ -52,7 +53,7 @@ InferCreationAttributes<Visit>
     declare createVillage: HasManyCreateAssociationMixin<Village>;
 
     declare static associations: {
-        User: Association<Visit, User>;
+        ResidentUser: Association<Visit, ResidentUser>;
         Visitor: Association<Visit, Visitor>;
         Village: Association<Visit, Village>;
     };
@@ -82,6 +83,10 @@ InferCreationAttributes<Visit>
             arrivalDate: {
                 type: DataTypes.STRING,
                 allowNull: false,
+            },
+            file: {
+                type: DataTypes.STRING,
+                allowNull: true,
             },
             createdAt: {
                 type: DataTypes.DATE,

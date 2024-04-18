@@ -16,9 +16,6 @@ const storage = new CloudinaryStorage({
 const cloudinaryUpload = multer({
     storage,
     fileFilter: (req, file: Express.Multer.File, cb) => {
-        if (file.mimetype.split('/')[0] !== 'image') {
-            return cb(null, false);
-        }
         return cb(null, true);
     },
 });

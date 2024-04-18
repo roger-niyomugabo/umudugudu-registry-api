@@ -33,8 +33,7 @@ InferAttributes<User>,
 InferCreationAttributes<User>
 > {
     declare id: CreationOptional<string>;
-    declare firstname: string;
-    declare surname: string;
+    declare fullName: string;
     declare email: string;
     declare NID: string;
     declare gender: genderT;
@@ -82,11 +81,7 @@ InferCreationAttributes<User>
                     allowNull: false,
                     defaultValue: Sequelize.literal('gen_random_uuid()'),
                 },
-                firstname: {
-                    type: DataTypes.STRING,
-                    allowNull: false,
-                },
-                surname: {
+                fullName: {
                     type: DataTypes.STRING,
                     allowNull: false,
                 },
@@ -135,8 +130,7 @@ InferCreationAttributes<User>
 
     static selectionAllowedFields: string[] = [
         'id',
-        'firstname',
-        'surname',
+        'fullName',
         'email',
         'NID',
         'gender',
@@ -147,13 +141,12 @@ InferCreationAttributes<User>
     ];
     static defaultSortFields: OrderClause[] = [
         ['role', 'asc'],
-        ['firstname', 'asc'],
+        ['fullName', 'asc'],
         ['createdAt', 'desc'],
     ];
     static sortAllowedFields: string[] = [
         'role',
-        'firstname',
-        'surname',
+        'fullName',
         'gender',
         'createdAt',
         'updatedAt',
@@ -161,8 +154,7 @@ InferCreationAttributes<User>
     static queryAllowedFields: { [field: string]: { type: QueryParameterType } } =
         {
             id: { type: 'string' },
-            firstname: { type: 'string' },
-            surname: { type: 'string' },
+            fullName: { type: 'string' },
             email: { type: 'string' },
             NID: { type: 'string' },
             gender: { type: 'string' },

@@ -15,8 +15,7 @@ const router = express.Router();
 
 // Admin registration validations
 const adminSignupValidations = Joi.object({
-    firstname: Joi.string().required(),
-    surname: Joi.string().required(),
+    fullName: Joi.string().required(),
     email: Joi.string().email().required(),
     NID: Joi.string().regex(NationalIDRegex).required().messages({
         'string.base': 'Please provide a valid National ID',

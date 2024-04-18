@@ -24,10 +24,8 @@ const villageValidations = Joi.object({
     sector: Joi.string().required(),
     cell: Joi.string().required(),
     village: Joi.string().required(),
-    aboutVillage: Joi.string().required(),
 
-    firstname: Joi.string().required(),
-    surname: Joi.string().required(),
+    fullName: Joi.string().required(),
     email: Joi.string().email().required(),
     NID: Joi.string().regex(NationalIDRegex).required().messages({
         'string.base': 'Please provide a valid National ID',
@@ -41,27 +39,20 @@ const villageValidations = Joi.object({
         'string.empty': 'Phone number is required',
     }),
 
-    username: Joi.string().min(2).required(),
-    dateOfBirth: Joi.string().required(),
-    nationality: Joi.string().required(),
     profession: Joi.string().required(),
 });
 
 router.post('/', isAdmin, validate(villageValidations), asyncMiddleware(async (req: Request, res: Response, next: NextFunction) => {
-    const { cell, village: vilageName, username, email, NID, phoneNumber } = req.body;
+    const { cell, village: vilageName, email, NID, phoneNumber } = req.body;
 
     const villageExistsPromise = Village.findOne({ where: { cell, village: vilageName } });
     const userExistsPromise = User.findOne({ where: { [Op.or] :[{ email }, { NID }, { phoneNumber }] } });
-    const chiefExistsPromise = ChiefUser.findOne({ where: { username } });
 
-    const [villageExists, userExists, chiefExists] = await Promise.all([villageExistsPromise, userExistsPromise, chiefExistsPromise]);
+    const [villageExists, userExists] = await Promise.all([villageExistsPromise, userExistsPromise]);
     if (villageExists) {
         return output(res, 409, 'Village already exixts', null, 'CONFLICT_ERROR');
     }
     if (userExists) {
-        return output(res, 409, 'User already exixts', null, 'CONFLICT_ERROR');
-    }
-    if (chiefExists) {
         return output(res, 409, 'User already exixts', null, 'CONFLICT_ERROR');
     }
     const password = generatePassword();
@@ -80,7 +71,7 @@ router.post('/', isAdmin, validate(villageValidations), asyncMiddleware(async (r
                 village: newVillage.dataValues,
             };
 
-            await mailer({ email: responseData.chiefUser.email, firstname: responseData.chiefUser.firstname, password, village: responseData.village.village }, 'accountCreationRequest');
+            await mailer({ email: responseData.chiefUser.email, fullName: responseData.chiefUser.fullName, password, village: responseData.village.village }, 'accountCreationRequest');
             return output(res, 201, 'Vilage created successfully', responseData, null);
         });
     } catch (error) {

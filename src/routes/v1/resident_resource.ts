@@ -4,7 +4,7 @@ import Joi from 'joi';
 import { Op } from 'sequelize';
 import output from '../../utils/response';
 import { asyncMiddleware } from '../../middleware/error_middleware';
-import { ChiefUser, ResidentUser, User, Village } from '../../db/models';
+import { ResidentUser, User, Village } from '../../db/models';
 import { isChiefUser } from '../../middleware/access_middleware';
 import { validate } from '../../middleware/middleware';
 import { db } from '../../db';
@@ -18,8 +18,7 @@ const router = express.Router();
 
 // Resident validations
 const residentValidations = Joi.object({
-    firstname: Joi.string().required(),
-    surname: Joi.string().required(),
+    fullName: Joi.string().required(),
     email: Joi.string().email().required(),
     NID: Joi.string().regex(NationalIDRegex).required().messages({
         'string.base': 'Please provide a valid National ID',
@@ -65,7 +64,7 @@ router.post('/register', isChiefUser, validate(residentValidations), asyncMiddle
                 ...resident.dataValues,
             };
 
-            await mailer({ email: residentUser.email, firstname: residentUser.firstname, password, village: village.village }, 'residentRegistrationRequest');
+            await mailer({ email: residentUser.email, fullName: residentUser.fullName, password, village: village.village }, 'residentRegistrationRequest');
             return output(res, 201, 'Resident registered successfully', residentUser, null);
         });
     } catch (error) {

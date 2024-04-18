@@ -26,7 +26,6 @@ InferCreationAttributes<Village>
     declare sector: string;
     declare cell: string;
     declare village: string;
-    declare aboutVillage: string;
     declare createdAt: CreationOptional<Date>;
     declare updatedAt: CreationOptional<Date>;
 
@@ -76,10 +75,6 @@ InferCreationAttributes<Village>
                 type: DataTypes.STRING,
                 allowNull: false,
             },
-            aboutVillage: {
-                type: DataTypes.STRING,
-                allowNull: false,
-            },
             createdAt: {
                 type: DataTypes.DATE,
             },
@@ -95,7 +90,7 @@ InferCreationAttributes<Village>
     }
 
     static selectionAllowedFields: string[] =
-        ['id', 'province', 'district', 'sector', 'cell', 'village', 'aboutVillage', 'createdAt', 'updatedAt'];
+        ['id', 'province', 'district', 'sector', 'cell', 'village', 'createdAt', 'updatedAt'];
     static defaultSortFields: OrderClause[] = [
         ['village', 'asc'],
     ];
@@ -107,7 +102,6 @@ InferCreationAttributes<Village>
         sector: { type: 'string' },
         cell: { type: 'string' },
         village: { type: 'string' },
-        aboutVillage: { type: 'string' },
         createdAt: { type: 'string' },
         updatedAt: { type: 'string' },
     };

@@ -17,7 +17,6 @@ const villageUpdateValidations = Joi.object({
     sector: Joi.string().required(),
     cell: Joi.string().required(),
     village: Joi.string().required(),
-    aboutVillage: Joi.string().required(),
 });
 
 // Update a village

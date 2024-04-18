@@ -7,7 +7,7 @@ export interface TokenPayloadI {
 
 export interface EmailInfo {
     email: string;
-    firstname?: string;
+    fullName?: string;
     password?: string;
     village?: string;
 }

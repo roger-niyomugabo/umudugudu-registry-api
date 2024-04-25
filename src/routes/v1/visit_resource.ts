@@ -5,12 +5,14 @@ import { Op } from 'sequelize';
 import output from '../../utils/response';
 import { asyncMiddleware } from '../../middleware/error_middleware';
 import { ResidentUser, User, Village, Visit, Visitor } from '../../db/models';
-import { isResident } from '../../middleware/access_middleware';
-import { validate } from '../../middleware/middleware';
+import { isLoggedIn, isResident } from '../../middleware/access_middleware';
+import { pagination, validate } from '../../middleware/middleware';
 import { db } from '../../db';
 import { NationalIDRegex, phoneNumberRegex } from '../../utils/globalValidations';
 import { gender } from '../../interfaces/userInterface';
 import cloudinaryUpload from '../../utils/file_upload';
+import { computePaginationRes } from '../../utils';
+import { VisitResult } from '../../interfaces/visitInterface';
 
 const router = express.Router();
 
@@ -105,6 +107,81 @@ router.post('/', isResident, cloudinaryUpload.single('file'), validate(visitVali
     } catch (error) {
         return output(res, 400, error.message || error, null, 'BAD_REQUEST');
     }
+})
+);
+
+// Get all visits
+router.get('/', isLoggedIn, pagination, asyncMiddleware(async (req: Request, res: Response, next: NextFunction) => {
+    const orderClause = Visit.getOrderQuery(req.query);
+    const selectClause = Visit.getSelectionQuery(req.query);
+    const whereClause = Visit.getWhereQuery(req.query);
+    const { residentUserId, villageId, role } = req.user;
+
+    let visits: VisitResult | null;
+
+    if (role === 'village_chief') {
+        const village = await Village.findOne({ where: { id: villageId } });
+        if (!village) {
+            return output(res, 400, 'Village does not exist', null, 'BAD_REQUEST');
+        }
+        visits = await Visit.findAndCountAll({
+            order: orderClause,
+            attributes: selectClause,
+            where: { ...whereClause, villageId }, include: [
+                { model: Visitor, as: 'visitor' },
+                { model: ResidentUser, as: 'resident_user',
+                    include: [
+                        {
+                            model: User,
+                            as: 'user',
+                        },
+                    ],
+                },
+            ],
+            limit: res.locals.pagination.limit,
+            offset: res.locals.pagination.offset,
+        });
+    }
+
+    if (role === 'resident') {
+        const user = await User.findOne({ where: { id: residentUserId, role: 'resident' } });
+        if (!user) {
+            return output(res, 400, 'User does not exist', null, 'BAD_REQUEST');
+        }
+        const residentPromise = ResidentUser.findOne({ where: { userId: user.id } });
+        const villagePromise = Village.findOne({ where: { id: villageId } });
+        const [resident, village] = await Promise.all([residentPromise, villagePromise]);
+        if (!village) {
+            return output(res, 400, 'Village does not exist', null, 'BAD_REQUEST');
+        }
+        visits = await Visit.findAndCountAll({
+            order: orderClause,
+            attributes: selectClause,
+            where: { ...whereClause, villageId, residentUserId: resident.id }, include: [
+                { model: Visitor, as: 'visitor' },
+            ],
+            limit: res.locals.pagination.limit,
+            offset: res.locals.pagination.offset,
+        });
+    }
+
+    if (role === 'admin') {
+        visits = await Visit.findAndCountAll({
+            order: orderClause,
+            attributes: selectClause,
+            limit: res.locals.pagination.limit,
+            offset: res.locals.pagination.offset,
+        });
+    }
+
+    return output(
+        res, 200, 'Visits retrieved successfully',
+        computePaginationRes(
+            res.locals.pagination.page,
+            res.locals.pagination.limit,
+            visits.count,
+            visits.rows),
+        null);
 })
 );
 

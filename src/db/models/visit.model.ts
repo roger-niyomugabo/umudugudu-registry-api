@@ -103,7 +103,7 @@ InferCreationAttributes<Visit>
     }
 
     static selectionAllowedFields: string[] =
-        ['id', 'origin', 'visitReason', 'duration', 'arrivalDate', 'createdAt', 'updatedAt'];
+        ['id', 'origin', 'visitReason', 'duration', 'arrivalDate', 'file', 'createdAt', 'updatedAt'];
     static defaultSortFields: OrderClause[] = [
         ['createdAt', 'desc'],
     ];

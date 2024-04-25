@@ -4,15 +4,16 @@ import Joi from 'joi';
 import { Op } from 'sequelize';
 import output from '../../utils/response';
 import { asyncMiddleware } from '../../middleware/error_middleware';
-import { ResidentUser, User, Village } from '../../db/models';
+import { ResidentUser, User, Village, Visit } from '../../db/models';
 import { isChiefUser } from '../../middleware/access_middleware';
-import { validate } from '../../middleware/middleware';
+import { pagination, validate } from '../../middleware/middleware';
 import { db } from '../../db';
 import { generate } from '../../utils/bcrypt';
 import { NationalIDRegex, phoneNumberRegex } from '../../utils/globalValidations';
 import { gender, maritalStatus } from '../../interfaces/userInterface';
 import { generatePassword } from '../../utils/generatePassword';
 import mailer from '../../utils/mailer';
+import { computePaginationRes } from '../../utils';
 
 const router = express.Router();
 
@@ -70,6 +71,43 @@ router.post('/register', isChiefUser, validate(residentValidations), asyncMiddle
     } catch (error) {
         return output(res, 500, error.message || error, null, 'INTERNAL_SERVER_ERROR');
     }
+})
+);
+
+// Get all residents
+router.get('/', isChiefUser, pagination, asyncMiddleware(async (req: Request, res: Response, next: NextFunction) => {
+    const orderClause = ResidentUser.getOrderQuery(req.query);
+    const selectClause = ResidentUser.getSelectionQuery(req.query);
+    const whereClause = ResidentUser.getWhereQuery(req.query);
+    const { chiefUserId, villageId } = req.user;
+
+    const userPromise = User.findOne({ where: { id: chiefUserId } });
+    const villagePromise = Village.findOne({ where: { id: villageId } });
+    const [village, user] = await Promise.all([userPromise, villagePromise]);
+    if (!user) {
+        return output(res, 400, 'User does not exist', null, 'BAD_REQUEST');
+    }
+    if (!village) {
+        return output(res, 400, 'Village does not exist', null, 'BAD_REQUEST');
+    }
+
+    const residents = await ResidentUser.findAndCountAll({
+        order: orderClause,
+        attributes: selectClause,
+        where: { ...whereClause, villageId }, include: [
+            { model: User, as: 'user' },
+        ],
+        limit: res.locals.pagination.limit,
+        offset: res.locals.pagination.offset,
+    });
+    return output(
+        res, 200, 'Residents retrieved successfully',
+        computePaginationRes(
+            res.locals.pagination.page,
+            res.locals.pagination.limit,
+            residents.count,
+            residents.rows),
+        null);
 })
 );
 

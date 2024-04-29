@@ -1,7 +1,7 @@
 import express, { NextFunction, Request, Response } from 'express';
 import { asyncMiddleware } from '../../middleware/error_middleware';
 import output from '../../utils/response';
-import { isChiefUser, isChiefUserOrResident } from '../../middleware/access_middleware';
+import { isChiefUser, isLoggedIn } from '../../middleware/access_middleware';
 import { Announcement, User, Village } from '../../db/models';
 
 const router = express.Router({ mergeParams: true });
@@ -32,19 +32,28 @@ router.delete('/', isChiefUser, asyncMiddleware(async (req: Request, res: Respon
 );
 
 // Get a single announcement
-router.get('/', isChiefUserOrResident, asyncMiddleware(async (req: Request, res: Response, next: NextFunction) => {
+router.get('/', isLoggedIn, asyncMiddleware(async (req: Request, res: Response, next: NextFunction) => {
     const { announcementId } = req.params;
-    const { villageId } = req.user;
+    const { villageId, role } = req.user;
 
-    const village = await Village.findOne({ where: { id: villageId } });
-    if (!village) {
-        return output(res, 400, 'Village does not exixt', null, 'BAD_REQUEST');
+    let announcement: Announcement | null;
+    if (role === 'village_chief' || role === 'resident') {
+        const village = await Village.findOne({ where: { id: villageId } });
+        if (!village) {
+            return output(res, 400, 'Village does not exixt', null, 'BAD_REQUEST');
+        }
+        announcement = await Announcement.findOne({ where: { id: announcementId, villageId }, include: [
+            { model: User, as: 'user' },
+        ] });
+        if (!announcement) {
+            return output(res, 400, 'No announcement found for your village', null, 'BAD_REQUEST');
+        }
     }
-    const announcement = await Announcement.findOne({ where: { id: announcementId, villageId }, include: [
-        { model: User, as: 'user' },
-    ] });
-    if (!announcement) {
-        return output(res, 400, 'No announcement found for your village', null, 'BAD_REQUEST');
+    if (role === 'admin') {
+        announcement = await Announcement.findOne({ where: { id: announcementId } });
+        if (!announcement) {
+            return output(res, 404, 'Announcement not found', null, 'NOT_FOUND_ERROR');
+        }
     }
     return output(res, 200, 'Announcement retrieved successfully', announcement, null);
 })

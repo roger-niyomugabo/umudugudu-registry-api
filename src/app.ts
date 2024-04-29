@@ -18,6 +18,7 @@ import resident_resource from './routes/v1/resident_resource';
 import visit_resource from './routes/v1/visit_resource';
 import announcement_detail from './routes/v1/announcement_detail';
 import announcement_resource from './routes/v1/announcement_resource';
+import visitor_resource from './routes/v1/visitor_resource';
 
 const createServer = (app) => {
     app.disable('x-powered-by');
@@ -54,6 +55,8 @@ const createServer = (app) => {
     // Announcement routes
     app.use('/api/v1/announcement/:announcementId', announcement_detail, router.all('/', methodNotAllowedErrorHandler));
     app.use('/api/v1/announcement', announcement_resource, router.all('/', methodNotAllowedErrorHandler));
+    // Visitor routes
+    app.use('/api/v1/visitor', visitor_resource, router.all('/', methodNotAllowedErrorHandler));
 
     // Middleware error handlers
     app.use(notFoundErrorHandler);

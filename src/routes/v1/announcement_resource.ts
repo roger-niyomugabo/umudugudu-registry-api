@@ -4,9 +4,10 @@ import Joi from 'joi';
 import output from '../../utils/response';
 import { asyncMiddleware } from '../../middleware/error_middleware';
 import { Announcement, User, Village } from '../../db/models';
-import { isChiefUser, isChiefUserOrResident } from '../../middleware/access_middleware';
+import { isChiefUser, isLoggedIn } from '../../middleware/access_middleware';
 import { pagination, validate } from '../../middleware/middleware';
 import { computePaginationRes } from '../../utils';
+import { AnnouncementResult } from '../../interfaces/announcementInterface';
 
 const router = express.Router();
 
@@ -35,25 +36,39 @@ router.post('/', isChiefUser, validate(announcementValidations), asyncMiddleware
 );
 
 // Get all announcements
-router.get('/', isChiefUserOrResident, pagination, asyncMiddleware(async (req: Request, res: Response, next: NextFunction) => {
+router.get('/', isLoggedIn, pagination, asyncMiddleware(async (req: Request, res: Response, next: NextFunction) => {
     const orderClause = Announcement.getOrderQuery(req.query);
     const selectClause = Announcement.getSelectionQuery(req.query);
     const whereClause = Announcement.getWhereQuery(req.query);
 
-    const { villageId } = req.user;
-    const village = await Village.findOne({ where: { id: villageId } });
-    if (!village) {
-        return output(res, 400, 'Village does not exist', null, 'BAD_REQUEST');
+    const { villageId, role } = req.user;
+    let announcements: AnnouncementResult;
+    if (role === 'village_chief' || role === 'resident') {
+        const village = await Village.findOne({ where: { id: villageId } });
+        if (!village) {
+            return output(res, 400, 'Village does not exist', null, 'BAD_REQUEST');
+        }
+        announcements = await Announcement.findAndCountAll({
+            order: orderClause,
+            attributes: selectClause,
+            where: { ...whereClause, villageId }, include: [
+                { model: User, as: 'user' },
+            ],
+            limit: res.locals.pagination.limit,
+            offset: res.locals.pagination.offset,
+        });
     }
-    const announcements = await Announcement.findAndCountAll({
-        order: orderClause,
-        attributes: selectClause,
-        where: { ...whereClause, villageId }, include: [
-            { model: User, as: 'user' },
-        ],
-        limit: res.locals.pagination.limit,
-        offset: res.locals.pagination.offset,
-    });
+    if (role === 'admin') {
+        announcements = await Announcement.findAndCountAll({
+            order: orderClause,
+            attributes: selectClause,
+            include: [
+                { model: Village, as: 'village' }, { model: User, as: 'user' },
+            ],
+            limit: res.locals.pagination.limit,
+            offset: res.locals.pagination.offset,
+        });
+    }
     return output(
         res, 200, 'Announcements retrieved successfully',
         computePaginationRes(

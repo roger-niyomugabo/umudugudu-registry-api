@@ -81,7 +81,7 @@ InferCreationAttributes<Announcement>
     static selectionAllowedFields: string[] =
         ['id', 'title', 'description', 'createdAt', 'updatedAt'];
     static defaultSortFields: OrderClause[] = [
-        ['title', 'asc'], ['createdAt', 'desc'],
+        ['createdAt', 'desc'],
     ];
     static sortAllowedFields: string[] = ['title', 'createdAt', 'updatedAt'];
     static queryAllowedFields: { [field: string]: { type: QueryParameterType } } = {
